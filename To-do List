@@ -1,0 +1,116 @@
+import tkinter as tk
+from tkinter import messagebox
+
+def rgb_to_hex(rgb):
+    return "#%02x%02x%02x" % rgb
+    
+root = tk.Tk()
+root["bg"]=rgb_to_hex((210, 246, 255))
+root.title("To-Do List App")
+
+title_label = tk.Label(root, text="To - Do List", font=("Times New Roman", 35 , "underline"), fg="purple" , width=17, bg=rgb_to_hex((210, 246, 255)))
+title_label.pack(pady=1)
+title_label.place(relx = 0.25, rely=0.32, anchor='center')
+
+frame = tk.Frame(root)
+frame.pack()
+frame.place(x=1050, y=140)
+
+listbox = tk.Listbox(frame, selectmode=tk.SINGLE, highlightcolor="purple", fg="purple", height=18, width=40,bg=rgb_to_hex((255, 255, 255)))
+listbox.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+scrollbar = tk.Scrollbar(frame, orient=tk.VERTICAL, command=listbox.yview)
+scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+listbox.config(yscrollcommand=scrollbar.set)
+
+label = tk.Label(root, text="Task Details", font=("Ariel",16), width=17,bg=rgb_to_hex((125, 240, 255)), borderwidth=5, relief="ridge")
+label.pack(pady=1)
+label.place(relx = 0.25, rely=0.60, anchor='center')
+
+entry_frame = tk.Frame(root, bg=rgb_to_hex((125, 240, 255)), borderwidth=5, relief="ridge")
+entry_frame.pack()
+entry_frame.place(relx = 0.25, rely=0.72, anchor='center')
+
+desc_label = tk.Label(entry_frame, text="Description:",bg=rgb_to_hex((125, 240, 255)))
+desc_label.grid(row=0, column=0, padx=10, pady=10, sticky=tk.E)
+desc_entry = tk.Entry(entry_frame)
+desc_entry.grid(row=0, column=1, padx=10, pady=10, sticky=tk.W)
+
+date_label = tk.Label(entry_frame, text="Due Date:", bg=rgb_to_hex((125, 240, 255)))
+date_label.grid(row=1, column=0, padx=10, pady=10, sticky=tk.E)
+date_entry = tk.Entry(entry_frame)
+date_entry.grid(row=1, column=1, padx=10, pady=10, sticky=tk.W)
+
+priority_label = tk.Label(entry_frame, text="Priority:", bg=rgb_to_hex((125, 240, 255)))
+priority_label.grid(row=2, column=0, padx=10, pady=10, sticky=tk.E)
+priority_entry = tk.Entry(entry_frame)
+priority_entry.grid(row=2, column=1, padx=10, pady=10, sticky=tk.W)
+
+def add_task():
+    desc = desc_entry.get()
+    date = date_entry.get()
+    priority = priority_entry.get()
+    if desc and date and priority:
+        task = (desc, ":", date, "(", priority, ")")
+        listbox.insert(tk.END, task)
+        desc_entry.delete(0, tk.END)
+        date_entry.delete(0, tk.END)
+        priority_entry.delete(0, tk.END)
+    else:
+        messagebox.showerror("Error", "Please enter all the task details")
+
+def remove_task():
+    try:
+        index = listbox.curselection()[0]
+        listbox.delete(index)
+        desc_entry.delete(0, tk.END)
+        date_entry.delete(0, tk.END)
+        priority_entry.delete(0, tk.END)
+    except IndexError:
+        messagebox.showerror("Error", "Please select a task to remove")
+
+def update_task():
+    try:
+        index = listbox.curselection()[0]
+        desc = desc_entry.get()
+        date = date_entry.get()
+        priority = priority_entry.get()
+        if desc and date and priority:
+            task = (desc, date, priority)
+            listbox.delete(index)
+            listbox.insert(index, task)
+            desc_entry.delete(0, tk.END)
+            date_entry.delete(0, tk.END)
+            priority_entry.delete(0, tk.END)
+        else:
+            messagebox.showerror("Error", "Please enter all the task details")
+    except IndexError:
+        messagebox.showerror("Error", "Please select a task to update")
+
+def show_task():
+    try:
+        index = listbox.curselection()[0]
+        task = listbox.get(index)
+        desc_entry.delete(0, tk.END)
+        desc_entry.insert(0, task[0])
+        date_entry.delete(0, tk.END)
+        date_entry.insert(0, task[1])
+        priority_entry.delete(0, tk.END)
+        priority_entry.insert(0, task[2])
+    except IndexError:
+        pass
+
+add_button = tk.Button(root, text="Add", command=add_task, bg=rgb_to_hex((0,229,229)))
+add_button.pack(side=tk.LEFT, padx=250)
+add_button.place(x=1050, y=800)
+
+remove_button = tk.Button(root, text="Remove", command=remove_task, bg=rgb_to_hex((0,229, 229)))
+remove_button.pack(side=tk.LEFT, padx=250)
+remove_button.place(x=1440, y=800)
+
+update_button = tk.Button(root, text="Update", command=update_task, bg=rgb_to_hex((0,229, 229)))
+update_button.pack(side=tk.LEFT, padx=250)
+update_button.place(x=1440, y=900)
+
+listbox.bind("<<ListboxSelect>>", lambda x: show_task())
+root.mainloop()
